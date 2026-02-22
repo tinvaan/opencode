@@ -992,6 +992,40 @@ export function Prompt(props: PromptProps) {
                 }, 0)
               }}
               onMouseDown={(r: MouseEvent) => r.target?.focus()}
+              onMouseUp={async (evt: MouseEvent) => {
+                const offset = input.cursorOffset
+                const extmarks = input.extmarks.getAtOffset(offset)
+
+                for (const extmark of extmarks) {
+                  if (extmark.typeId !== promptPartTypeId) {
+                    continue
+                  }
+
+                  const partIndex = store.extmarkToPartIndex.get(extmark.id)
+                  if (partIndex === undefined) {
+                    continue
+                  }
+
+                  const part = store.prompt.parts[partIndex]
+                  if (part?.type !== "file" || !part.url || !part.mime?.startsWith("image/")) {
+                    continue
+                  }
+
+                  fetch(sdk.url + "/tui/publish", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      type: TuiEvent.ImageClick.type,
+                      properties: {
+                        url: part.url,
+                        mime: part.mime,
+                        filename: part.filename,
+                      },
+                    }),
+                  }).catch(() => {})
+                  break
+                }
+              }}
               focusedBackgroundColor={theme.backgroundElement}
               cursorColor={theme.text}
               syntaxStyle={syntax()}
