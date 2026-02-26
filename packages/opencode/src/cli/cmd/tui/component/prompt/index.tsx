@@ -992,7 +992,7 @@ export function Prompt(props: PromptProps) {
                 }, 0)
               }}
               onMouseDown={(r: MouseEvent) => r.target?.focus()}
-              onMouseUp={async (evt: MouseEvent) => {
+              onMouseUp={async () => {
                 const offset = input.cursorOffset
                 const extmarks = input.extmarks.getAtOffset(offset)
 
@@ -1011,18 +1011,31 @@ export function Prompt(props: PromptProps) {
                     continue
                   }
 
-                  fetch(sdk.url + "/tui/publish", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      type: TuiEvent.ImageClick.type,
-                      properties: {
-                        url: part.url,
-                        mime: part.mime,
-                        filename: part.filename,
-                      },
-                    }),
-                  }).catch(() => {})
+                  sdk
+                    .fetch(sdk.url + "/tui/publish", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        type: TuiEvent.ImageClick.type,
+                        properties: {
+                          url: part.url,
+                          mime: part.mime,
+                          filename: part.filename,
+                        },
+                      }),
+                    })
+                    .then((res) => {
+                      if (!res.ok) {
+                        throw Error(`Failed to open preview: ${res.status}`)
+                      }
+                    })
+                    .catch((err) => {
+                      toast.show({
+                        message: err.message ?? `Error: "Unknown error"`,
+                        variant: "error",
+                        duration: 3000,
+                      })
+                    })
                   break
                 }
               }}
