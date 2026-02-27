@@ -45,12 +45,10 @@ export const TuiEvent = {
       sessionID: z.string().regex(/^ses/).describe("Session ID to navigate to"),
     }),
   ),
-  ImageClick: BusEvent.define(
-    "tui.image.click",
+  PartClick: BusEvent.define(
+    "tui.part.click",
     z.object({
-      url: z.string().describe("Base64 data URL of the image"),
-      mime: z.string().describe("MIME type of the image"),
-      filename: z.string().optional().describe("Original filename if available"),
+      part: z.record(z.string(), z.unknown()).describe("The part that was clicked"),
     }),
   ),
 }

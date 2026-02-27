@@ -997,45 +997,24 @@ export function Prompt(props: PromptProps) {
                 const extmarks = input.extmarks.getAtOffset(offset)
 
                 for (const extmark of extmarks) {
-                  if (extmark.typeId !== promptPartTypeId) {
-                    continue
-                  }
+                  if (extmark.typeId !== promptPartTypeId) continue
 
                   const partIndex = store.extmarkToPartIndex.get(extmark.id)
-                  if (partIndex === undefined) {
-                    continue
-                  }
+                  if (partIndex === undefined) continue
 
                   const part = store.prompt.parts[partIndex]
-                  if (part?.type !== "file" || !part.url || !part.mime?.startsWith("image/")) {
-                    continue
-                  }
+                  if (!part) continue
 
                   sdk
                     .fetch(sdk.url + "/tui/publish", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
-                        type: TuiEvent.ImageClick.type,
-                        properties: {
-                          url: part.url,
-                          mime: part.mime,
-                          filename: part.filename,
-                        },
+                        type: TuiEvent.PartClick.type,
+                        properties: { part },
                       }),
                     })
-                    .then((res) => {
-                      if (!res.ok) {
-                        throw Error(`Failed to open preview: ${res.status}`)
-                      }
-                    })
-                    .catch((err) => {
-                      toast.show({
-                        message: err.message ?? `Error: "Unknown error"`,
-                        variant: "error",
-                        duration: 3000,
-                      })
-                    })
+                    .catch((err) => console.error("Failed to publish part click event:", err))
                   break
                 }
               }}
