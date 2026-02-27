@@ -769,6 +769,18 @@ export type EventTuiSessionSelect = {
   }
 }
 
+export type EventTuiPartClick = {
+  type: "tui.part.click"
+  properties: {
+    /**
+     * The part that was clicked
+     */
+    part: {
+      [key: string]: unknown
+    }
+  }
+}
+
 export type EventMcpToolsChanged = {
   type: "mcp.tools.changed"
   properties: {
@@ -970,6 +982,7 @@ export type Event =
   | EventTuiCommandExecute
   | EventTuiToastShow
   | EventTuiSessionSelect
+  | EventTuiPartClick
   | EventMcpToolsChanged
   | EventMcpBrowserOpenFailed
   | EventCommandExecuted
@@ -4465,7 +4478,7 @@ export type TuiShowToastResponses = {
 export type TuiShowToastResponse = TuiShowToastResponses[keyof TuiShowToastResponses]
 
 export type TuiPublishData = {
-  body?: EventTuiPromptAppend | EventTuiCommandExecute | EventTuiToastShow | EventTuiSessionSelect
+  body?: EventTuiPromptAppend | EventTuiCommandExecute | EventTuiToastShow | EventTuiSessionSelect | EventTuiPartClick
   path?: never
   query?: {
     directory?: string
